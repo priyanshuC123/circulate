@@ -6,6 +6,7 @@ import { onAuthStateChanged } from 'firebase/auth'; // Import Firebase authentic
 import { addNotification, Notification } from '../firebase/notifications'; // Importing notification functions
 import { Timestamp } from 'firebase/firestore';
 import RequestModal from './RequestModal'; // Import the modal component
+import Modal from './loginSingUpModal'; // Import the login/signup modal
 
 interface Product {
   id: string;
@@ -23,6 +24,9 @@ const ProductDetail: React.FC = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [modalAction, setModalAction] = useState<'buy' | 'borrow' | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [isImageModalOpen, setIsImageModalOpen] = useState<boolean>(false);
+  const [showModal, setShowModal] = useState(false);
+  const [isLogin, setIsLogin] = useState(true);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -70,17 +74,40 @@ const ProductDetail: React.FC = () => {
     }
   };
 
+  const handleBuyClick = () => {
+    if (userId) {
+      setModalAction('buy');
+    } else {
+      setIsLogin(true);
+      setShowModal(true);
+    }
+  };
+
+  const handleBorrowClick = () => {
+    if (userId) {
+      setModalAction('borrow');
+    } else {
+      setIsLogin(true);
+      setShowModal(true);
+    }
+  };
+
   if (!product) return <p>Loading...</p>;
 
   return (
-    <div className="max-w-full mx-auto mt-8 p-4">
+    <div className="max-w-full mx-auto mt-8 p-4 pr-40 pl-40">
       <div className="flex flex-col md:flex-row">
         <div className="md:w-1/3 flex justify-center items-center">
-          <img 
-            src={product.imageUrl || "https://via.placeholder.com/300"} 
-            alt={product.name} 
-            className="w-full md:w-100 object-cover rounded-md shadow-md"
-          />
+          <div
+            className="w-80 h-80 p-4 box-border cursor-pointer bg-white rounded-md shadow-md"
+            onClick={() => setIsImageModalOpen(true)}
+          >
+            <img 
+              src={product.imageUrl || "https://via.placeholder.com/300"} 
+              alt={product.name} 
+              className="w-full h-full object-contain"
+            />
+          </div>
         </div>
 
         <div className="md:w-2/3 md:ml-8 mt-4 md:mt-0">
@@ -91,22 +118,20 @@ const ProductDetail: React.FC = () => {
           )}
           <div className="flex items-center space-x-4">
             <button 
-              onClick={() => setModalAction('buy')} 
+              onClick={handleBuyClick} 
               disabled={product.status === 'sold'}
               className="bg-green-500 text-white font-bold py-2 px-4 rounded-md hover:bg-green-600 transition-all"
             >
               {product.status === 'sold' ? 'Sold' : 'Buy'}
             </button>
             {product.rentPrice && product.rentPrice > 0 && (
-              <>
-                <button 
-                  onClick={() => setModalAction('borrow')} 
-                  disabled={product.status === 'borrowed' || product.status === 'sold'}
-                  className="bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600 transition-all"
-                >
-                  {product.status === 'borrowed' ? 'Borrowed' : 'Borrow'}
-                </button>
-              </>
+              <button 
+                onClick={handleBorrowClick} 
+                disabled={product.status === 'borrowed' || product.status === 'sold'}
+                className="bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600 transition-all"
+              >
+                {product.status === 'borrowed' ? 'Borrowed' : 'Borrow'}
+              </button>
             )}
           </div>
         </div>
@@ -123,6 +148,34 @@ const ProductDetail: React.FC = () => {
         onClose={() => setModalAction(null)}
         onConfirm={handleRequest}
         action={modalAction!}
+      />
+
+      {/* Full-Screen Image Modal */}
+      {isImageModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75">
+          <div className="relative">
+            <button 
+              className="absolute top-0 right-0 m-4 text-white text-2xl" 
+              onClick={() => setIsImageModalOpen(false)}
+            >
+              &times;
+            </button>
+            <img 
+              src={product.imageUrl || "https://via.placeholder.com/300"} 
+              alt={product.name} 
+              className="w-screen h-screen object-contain"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Login/Signup Modal */}
+      <Modal 
+        showModal={showModal} 
+        setShowModal={setShowModal} 
+        isLogin={isLogin} 
+        setIsLogin={setIsLogin} 
+        setLoggedIn={(isLoggedIn) => setUserId(isLoggedIn ? userId : null)} 
       />
     </div>
   );

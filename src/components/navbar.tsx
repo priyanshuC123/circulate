@@ -3,8 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { auth } from '../firebase/setup';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import Modal from "./loginSingUpModal";
-import logo from "../assets/logo (2).png";
-import search from "../assets/search.png";
+import logo from "../assets/logo_icon (2).png";
+import search from "../assets/searchicon.png";
 import bell from "../assets/bell.png";
 import { getNotifications, Notification } from '../firebase/notifications';
 
@@ -14,21 +14,20 @@ const Navbar: React.FC = () => {
     const [loggedIn, setLoggedIn] = useState<boolean>(false);
     const [loading, setLoading] = useState(true);
     const [notifications, setNotifications] = useState<Notification[]>([]);
-    const [searchQuery, setSearchQuery] = useState<string>(''); // State to capture the search query
+    const [searchQuery, setSearchQuery] = useState<string>(''); 
     const navigate = useNavigate();
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             if (user) {
-                console.log(`User is logged in with ID: ${user.uid}`); // Debug log for userId
+                console.log(`User is logged in with ID: ${user.uid}`);
                 setLoggedIn(true);
-                // Fetch notifications for the logged-in user
                 const userNotifications = await getNotifications(user.uid);
                 setNotifications(userNotifications);
             } else {
-                console.log("User is not logged in"); // Debug log for no user
+                console.log("User is not logged in");
                 setLoggedIn(false);
-                setNotifications([]); // Clear notifications if not logged in
+                setNotifications([]);
             }
             setLoading(false);
         });
@@ -60,7 +59,6 @@ const Navbar: React.FC = () => {
     };
 
     const handleSearch = () => {
-        // Trigger the search using the current query
         if (searchQuery.trim() !== '') {
             navigate(`/?search=${searchQuery}`);
         }
@@ -78,56 +76,59 @@ const Navbar: React.FC = () => {
 
     return (
         <>
-            <nav className="flex justify-between items-center p-4 bg-gray-800 text-white">
+            <nav className="flex justify-between items-center p-6 bg-gradient-to-r from-gray-800 via-gray-700 to-gray-600 text-white ">
                 <div className="flex items-center">
                     <Link to="/">
-                        <img src={logo} alt="Logo" className="h-10 mr-2" />
+                        <img src={logo} alt="Logo" className="h-12 mr-2 rounded-full shadow-md" />
                     </Link>
-                    <Link to="/" className="text-xl font-bold text-white">
+                    <Link to="/" className="text-2xl font-extrabold text-white tracking-wide">
                         Circulate
                     </Link>
                 </div>
-                <div className="flex items-center ml-auto">
-                    <div className="flex items-center bg-white text-gray-900 rounded-md shadow-sm mr-4">
+                
+                <div className="flex justify-center flex-1">
+                    <div className="flex items-center bg-white text-gray-900 rounded-full shadow-lg">
                         <input 
                             type="text" 
-                            placeholder="Search" 
-                            className="p-2 w-96 rounded-l-md border border-gray-300 focus:outline-none"
+                            placeholder="Search for products..." 
+                            className="p-2 pl-5 w-96 rounded-l-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            onKeyPress={handleKeyPress} // Trigger search on Enter key press
+                            onKeyPress={handleKeyPress} 
                         />
                         <button 
-                            className="bg-blue-500 text-white p-2 rounded-r-md h-10"
+                            className="bg-blue-500 text-white p-2 rounded-r-full hover:bg-blue-600 transition-colors"
                             onClick={handleSearch}
+                            style={{ height: '42px' }}
                         >
                             <img src={search} alt="Search" className="h-5 w-5" />
                         </button>
                     </div>
+                </div>
+
+                <div className="flex items-center">
                     {loggedIn ? (
                         <>
-                            <Link to="/dashboard" className="mr-4 font-bold text-white">Dashboard</Link>
-                            <button onClick={handleLogout} className="mr-4 font-bold text-white">Logout</button>
-
-                            {/* Bell Icon with notification count */}
-                            <div className="relative">
+                            <div className="relative mr-4">
                                 <Link to="/notifications">
                                     <img src={bell} alt="Notifications" className="h-8 w-8" />
                                 </Link>
                                 {notifications.length > 0 && (
-                                    <span className="absolute top-0 right-0 inline-block w-4 h-4 bg-red-600 text-white text-xs font-bold rounded-full text-center">
+                                    <span className="absolute top-0 right-0 inline-block w-5 h-5 bg-red-600 text-white text-xs font-bold rounded-full text-center shadow-lg">
                                         {notifications.length}
                                     </span>
                                 )}
                             </div>
-
+                            <Link to="/dashboard" className="mr-4 font-bold text-white hover:underline">Dashboard</Link>
+                            <button onClick={handleLogout} className="mr-4 font-bold text-white hover:underline">Logout</button>
                         </>
                     ) : (
-                        <button onClick={toggleModal} className="mr-4 font-bold text-white">Login</button>
+                        <button onClick={toggleModal} className="mr-4 font-bold text-white hover:underline">Login</button>
                     )}
                     <button 
                         onClick={handleSellClick} 
-                        className="bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-600 transition-all"
+                        className="relative bg-blue-500 text-white font-bold py-2 px-3 rounded-full shadow-lg transition-all hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300
+                        before:absolute before:inset-0 before:rounded-full before:border-2 before:border-white before:transform-gpu before:scale-105 before:opacity-100"
                     >
                         + SELL
                     </button>
