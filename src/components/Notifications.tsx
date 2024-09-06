@@ -3,7 +3,7 @@ import { getNotifications, updateNotificationApproval, notifyRequesterAfterAppro
 import { auth } from '../firebase/setup';
 import { onAuthStateChanged } from 'firebase/auth';
 import { Timestamp } from 'firebase/firestore';
-
+import LoadingSpinner from './LoadingSpinner';
 const Notifications: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,11 +64,12 @@ const Notifications: React.FC = () => {
   };
 
   if (loading) {
-    return <p>Loading...</p>;
+    return <LoadingSpinner />;
   }
+  
 
   return (
-    <div className="max-w-full mx-auto mt-8 p-4">
+    <div className="max-w-full mx-auto mt-8 p-4 pt-20">
       <h2 className="text-2xl font-bold mb-4">Notifications</h2>
       {notifications.length === 0 ? (
         <p>No notifications</p>

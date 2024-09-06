@@ -8,7 +8,7 @@ import Dashboard from './components/Dashboard';
 import { auth } from './firebase/setup';  
 import { onAuthStateChanged } from 'firebase/auth'; 
 import Notifications from './components/Notifications';
-
+import LoadingSpinner from './components/LoadingSpinner';
 const App: React.FC = () => {
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -28,9 +28,9 @@ const App: React.FC = () => {
   }, []);
 
   if (loading) {
-    // Show a loading spinner or message while determining auth state
-    return <div>Loading...</div>;
+    return <LoadingSpinner />;
   }
+  
 
   return (
     <Router>

@@ -109,7 +109,7 @@ const SellPage: React.FC = () => {
   };
 
   return (
-    <div className="sell-page max-w-2xl mx-auto mt-8 p-4 bg-white shadow-md rounded-lg">
+    <div className="sell-page max-w-2xl mx-auto mt-8 p-4 bg-white shadow-md rounded-lg pt-20">
       <h1 className="text-2xl font-semibold mb-6">Sell Product</h1>
       <input 
         type="text" 

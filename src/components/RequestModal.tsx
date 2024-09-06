@@ -22,7 +22,7 @@ const RequestModal: React.FC<RequestModalProps> = ({ isOpen, onClose, onConfirm,
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center pt-20">
       <div className="bg-white p-6 rounded-lg shadow-lg">
         <h2 className="text-xl font-semibold mb-4">Confirm {action === 'buy' ? 'Purchase' : 'Borrow'}</h2>
         <label className="block text-gray-700 mb-2">Phone Number:</label>

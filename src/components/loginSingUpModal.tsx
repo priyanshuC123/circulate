@@ -1,6 +1,6 @@
-import React from 'react';
-import { signInWithPopup } from "firebase/auth";
-import { auth, googleProvider } from "../firebase/setup"; // Adjust this path to your project structure
+import React, { useState } from 'react';
+import { signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { auth, googleProvider } from "../firebase/setup"; // Firebase setup
 import googleimg from '../assets/google.webp';
 
 interface ModalProps {
@@ -8,10 +8,14 @@ interface ModalProps {
     setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
     isLogin: boolean;
     setIsLogin: React.Dispatch<React.SetStateAction<boolean>>;
-    setLoggedIn: React.Dispatch<React.SetStateAction<boolean>>; // New prop to update loggedIn state
+    setLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const Modal: React.FC<ModalProps> = ({ showModal, setShowModal, isLogin, setIsLogin, setLoggedIn }) => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [name, setName] = useState(''); // For signup
+
     if (!showModal) return null;
 
     const toggleModal = () => {
@@ -25,12 +29,36 @@ const Modal: React.FC<ModalProps> = ({ showModal, setShowModal, isLogin, setIsLo
     const googleSignin = async () => {
         try {
             await signInWithPopup(auth, googleProvider);
-            setLoggedIn(true); // Update the loggedIn state in the Navbar
-            setShowModal(false); // Close the modal after successful sign-in
+            setLoggedIn(true);
+            setShowModal(false);
         } catch (err) {
             console.error(err);
         }
-    }
+    };
+
+    const handleLogin = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            setLoggedIn(true);
+            setShowModal(false);
+        } catch (err) {
+            console.error(err);
+            alert("Login failed. Please check your credentials.");
+        }
+    };
+
+    const handleSignup = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            await createUserWithEmailAndPassword(auth, email, password);
+            setLoggedIn(true);
+            setShowModal(false);
+        } catch (err) {
+            console.error(err);
+            alert("Signup failed. Please try again.");
+        }
+    };
 
     return (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
@@ -54,7 +82,75 @@ const Modal: React.FC<ModalProps> = ({ showModal, setShowModal, isLogin, setIsLo
                         {isLogin ? 'Login with Google' : 'Sign Up with Google'}
                     </button>
                     <div className="text-center text-gray-500 my-2">or</div>
-                    {isLogin ? <LoginForm /> : <SignupForm />}
+                    {isLogin ? (
+                        <form onSubmit={handleLogin}>
+                            <div className="mb-4">
+                                <label className="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                                <input
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    placeholder="Enter your email"
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <label className="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                                <input
+                                    type="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    placeholder="Enter your password"
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+                            >
+                                Login
+                            </button>
+                        </form>
+                    ) : (
+                        <form onSubmit={handleSignup}>
+                            <div className="mb-4">
+                                <label className="block text-gray-700 text-sm font-bold mb-2">Name</label>
+                                <input
+                                    type="text"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    placeholder="Enter your name"
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <label className="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                                <input
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    placeholder="Enter your email"
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <label className="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                                <input
+                                    type="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    placeholder="Enter your password"
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+                            >
+                                Sign Up
+                            </button>
+                        </form>
+                    )}
                 </div>
                 <div className="p-4 border-t text-center">
                     {isLogin ? (
@@ -77,65 +173,5 @@ const Modal: React.FC<ModalProps> = ({ showModal, setShowModal, isLogin, setIsLo
         </div>
     );
 };
-
-const LoginForm: React.FC = () => (
-    <form>
-        <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">Email</label>
-            <input 
-                type="email" 
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
-                placeholder="Enter your email" 
-            />
-        </div>
-        <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">Password</label>
-            <input 
-                type="password" 
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
-                placeholder="Enter your password" 
-            />
-        </div>
-        <button 
-            type="submit" 
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full">
-            Login
-        </button>
-    </form>
-);
-
-const SignupForm: React.FC = () => (
-    <form>
-        <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">Name</label>
-            <input 
-                type="text" 
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
-                placeholder="Enter your name" 
-            />
-        </div>
-        <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">Email</label>
-            <input 
-                type="email" 
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
-                placeholder="Enter your email" 
-            />
-        </div>
-        <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">Password</label>
-            <input 
-                type="password" 
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
-                placeholder="Enter your password" 
-            />
-        </div>
-        <button 
-            type="submit" 
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full">
-            Sign Up
-        </button>
-    </form>
-);
 
 export default Modal;

@@ -7,6 +7,7 @@ import { addNotification, Notification } from '../firebase/notifications'; // Im
 import { Timestamp } from 'firebase/firestore';
 import RequestModal from './RequestModal'; // Import the modal component
 import Modal from './loginSingUpModal'; // Import the login/signup modal
+import LoadingSpinner from './LoadingSpinner';
 
 interface Product {
   id: string;
@@ -92,14 +93,16 @@ const ProductDetail: React.FC = () => {
     }
   };
 
-  if (!product) return <p>Loading...</p>;
+  if (!product) {
+    return <LoadingSpinner />;
+  }
 
   return (
-    <div className="max-w-full mx-auto mt-8 p-4 pr-40 pl-40">
+    <div className=" bg-gray-100 max-w-7xl mx-auto mt-8 p-4 pr-8 pl-8 lg:pt-20  pt-40 md:pr-40 md:pl-40">
       <div className="flex flex-col md:flex-row">
-        <div className="md:w-1/3 flex justify-center items-center">
+        <div className="md:w-1/3 w-full flex justify-center items-center">
           <div
-            className="w-80 h-80 p-4 box-border cursor-pointer bg-white rounded-md shadow-md"
+            className="w-full h-80 p-4 box-border cursor-pointer bg-white rounded-md shadow-md md:w-80"
             onClick={() => setIsImageModalOpen(true)}
           >
             <img 
@@ -111,7 +114,7 @@ const ProductDetail: React.FC = () => {
         </div>
 
         <div className="md:w-2/3 md:ml-8 mt-4 md:mt-0">
-          <h2 className="text-3xl font-semibold mb-4">{product.name}</h2>
+          <h2 className="text-2xl font-semibold mb-4">{product.name}</h2>
           <p className="text-xl text-gray-700 mb-2">Price: ₹{product.price}</p>
           {product.rentPrice && product.rentPrice > 0 && (
             <p className="text-xl text-gray-500 mb-4">Rent Price: ₹{product.rentPrice}</p>

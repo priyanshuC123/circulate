@@ -13,3 +13,8 @@
     margin-top: 0;
     padding-top: 0;
 }
+
+/* Apply bg-gray-100 to the body */
+body {
+    @apply bg-gray-100;
+}
